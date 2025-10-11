@@ -1,0 +1,17 @@
+{
+    "name": "mdalikadar/php-cli-toolkit",
+    "description": "A toolkit to build and manage PHP based command line application.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "PhpCliToolkit\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "MD ALI KADAR"
+        }
+    ],
+    "require": {}
+}
