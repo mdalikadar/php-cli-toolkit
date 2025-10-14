@@ -13,14 +13,33 @@ class Text {
         [10, ' ', [42]],
     ];
     protected array  $edgeSpaces = [
-        [0, ' ', []],
-        [0, ' ', []],
-        [0, ' ', []],
-        [0, ' ', []],
+        [2, ' ', [43]],
+        [2, ' ', [43]],
+        [2, ' ', [43]],
+        [2, ' ', [43]],
     ];
 
     public function __construct(protected string $text) {
         $this->charLength = strlen($this->text);
+        $this->updateTerminalWidth();
+    }
+
+    public function updateTerminalWidth() : void {
+        if(strpos(PHP_OS, 'WIN') !== false) {
+            preg_match(
+                '|-{8,}\r?\n(?:.*?(\d+).*\r?\n.*?(\d+))|', 
+                shell_exec('mode con'), 
+                $match
+            );
+            if(!empty($w = intval($match[1]))){
+                $this->terminalWidth = $w;
+            }
+        }
+        else {
+            if(!empty($w = intval(shell_exec('tput cols')))){
+                $this->terminalWidth = $w;
+            }
+        }
     }
 
     public function style(array $styles) : static {
@@ -32,7 +51,8 @@ class Text {
         [$top, $bottom, $left, $right]     = $this->spaces;
         [$eTop, $eBottom, $eLeft, $eRight] = $this->edgeSpaces;
         sort($this->styles);
-        $lineWidth = $this->terminalWidth - $eLeft[0] - $eRight[0] - $left[0] - $right[0];
+        $elc = $eLeft[0] + $eRight[0] + $left[0] + $right[0];
+        $lineWidth = $this->terminalWidth - $elc;
         $lines = explode(
             "\n", 
             wordwrap(
@@ -42,59 +62,71 @@ class Text {
                 true
             )
         );
+        // var_dump($this->terminalWidth , $elc,$lines, $lineWidth);exit;
         foreach(range(1,$eTop[0]) as $lt) {
-            $this->lines[] = $this->apply_style(
-                $eTop[2],
-                str_repeat($eTop[1], $this->terminalWidth)
+            $this->lines[] = (
+                $this->apply_style(
+                    $eTop[2],
+                    str_repeat($eTop[1], $this->terminalWidth )
+                )
             );
         }
 
         foreach(range(1,$top[0]) as $lt) {
-            $this->lines[] = $this->apply_style(
-                $top[2],
-                str_repeat($top[1], $this->terminalWidth)
+            $this->lines[] = (
+                $this->add_spaces($eLeft).
+                $this->add_spaces($left).
+                $this->apply_style(
+                    $top[2],
+                    str_repeat($top[1], $lineWidth)
+                ).
+                $this->add_spaces($right).
+                $this->add_spaces($eRight)
             );
         }
 
         foreach($lines as $line) {
             $this->lines[] = (
-                $this->apply_style(
-                    $eLeft[2],
-                    str_repeat($eLeft[1], $eLeft[0])
-                ).
-                $this->apply_style(
-                    $left[2],
-                    str_repeat($left[1], $left[0])
-                ).
+                $this->add_spaces($eLeft).
+                $this->add_spaces($left).
                 $this->apply_style(
                     $this->styles,
                     $line
                 ).
-                $this->apply_style(
-                    $right[2],
-                    str_repeat($right[1], $right[0])
-                ).
-                $this->apply_style(
-                    $eRight[2],
-                    str_repeat($eRight[1], $eRight[0])
-                )
+                $this->add_spaces($right).
+                $this->add_spaces($eRight)
             );
         }
 
         foreach(range(1,$bottom[0]) as $lt) {
-            $this->lines[] = $this->apply_style(
-                $bottom[2],
-                str_repeat($bottom[1], $this->terminalWidth)
+            $this->lines[] = (
+                $this->add_spaces($eLeft).
+                $this->add_spaces($left).
+                $this->apply_style(
+                    $bottom[2],
+                    str_repeat($bottom[1], $lineWidth)
+                ).
+                $this->add_spaces($right).
+                $this->add_spaces($eRight)
             );
         }
 
         foreach(range(1,$eBottom[0]) as $lt) {
-            $this->lines[] = $this->apply_style(
-                $eBottom[2],
-                str_repeat($eBottom[1], $this->terminalWidth)
+            $this->lines[] = (
+                $this->apply_style(
+                    $eBottom[2],
+                    str_repeat($eBottom[1], $this->terminalWidth)
+                )
             );
         }
         return $this;
+    }
+
+    public function add_spaces(array $space) : string {
+        return $this->apply_style(
+                    $space[2],
+                    str_repeat($space[1], $space[0])
+                );
     }
 
     public function apply_style(array $styles, string $text) : string {
