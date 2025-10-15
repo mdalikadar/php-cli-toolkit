@@ -98,7 +98,7 @@ class Text {
             )
         );
         // var_dump($this->terminalWidth , $elc,$lines, $lineWidth);exit;
-        foreach(range(1,$eTop[0]) as $lt) {
+        foreach(($eTop[0] > 0 ? range(1,$eTop[0]) : []) as $lt) {
             $this->lines[] = (
                 $this->apply_style(
                     $eTop[2],
@@ -107,7 +107,7 @@ class Text {
             );
         }
 
-        foreach(range(1,$top[0]) as $lt) {
+        foreach(($top[0] > 0 ? range(1,$top[0]) : []) as $lt) {
             $this->lines[] = (
                 $this->add_spaces($eLeft).
                 $this->add_spaces($left).
@@ -133,7 +133,7 @@ class Text {
             );
         }
 
-        foreach(range(1,$bottom[0]) as $lt) {
+        foreach(($bottom[0] > 0 ? range(1,$bottom[0]) : []) as $lt) {
             $this->lines[] = (
                 $this->add_spaces($eLeft).
                 $this->add_spaces($left).
@@ -146,7 +146,7 @@ class Text {
             );
         }
 
-        foreach(range(1,$eBottom[0]) as $lt) {
+        foreach(($eBottom[0] > 0 ? range(1,$eBottom[0]) : []) as $lt) {
             $this->lines[] = (
                 $this->apply_style(
                     $eBottom[2],
