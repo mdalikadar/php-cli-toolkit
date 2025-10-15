@@ -31,7 +31,7 @@ class Text {
                 shell_exec('mode con'), 
                 $match
             );
-            if(!empty($w = intval($match[1]))){
+            if(!empty($w = intval($match[2]))){
                 $this->terminalWidth = $w;
             }
         }
@@ -131,7 +131,7 @@ class Text {
 
     public function apply_style(array $styles, string $text) : string {
         return (
-            (!empty($this->styles) ? "\033[".implode(';', $styles)."m" : '').
+            (!empty($styles) ? "\033[".implode(';', $styles)."m" : '').
             $text.
             "\033[0m"
         );
