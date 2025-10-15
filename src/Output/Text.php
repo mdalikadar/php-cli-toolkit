@@ -1,27 +1,62 @@
 <?php
 namespace PhpCliToolkit\Output;
+use PhpCliToolkit\Exceptions\CliException;
 class Text {
-    public const RESET = 0;
+    public const TOP    = 0;
+    public const BOTTOM = 1;
+    public const LEFT   = 2;
+    public const RIGHT  = 3;
+    public const ALL    = 4;
     protected int    $charLength;
     protected int    $terminalWidth = 80;
     protected array  $lines = [];
     protected array  $styles = [];
     protected array  $spaces = [
-        [10, ' ', [42]],
-        [10, ' ', [42]],
-        [10, ' ', [42]],
-        [10, ' ', [42]],
+        [0, ' ', []],
+        [0, ' ', []],
+        [0, ' ', []],
+        [0, ' ', []],
     ];
     protected array  $edgeSpaces = [
-        [2, ' ', [43]],
-        [2, ' ', [43]],
-        [2, ' ', [43]],
-        [2, ' ', [43]],
+        [0, ' ', []],
+        [0, ' ', []],
+        [0, ' ', []],
+        [0, ' ', []],
     ];
 
     public function __construct(protected string $text) {
         $this->charLength = strlen($this->text);
         $this->updateTerminalWidth();
+    }
+
+    public function space(int $position, int $space,  array $style, string $char = ' ') : static {
+        $this->_space('spaces', $position, $space, $style, $char);
+        return $this;
+    }
+
+    public function edgeSpace(int $position, int $space,  array $style, string $char = ' ') : static {
+        $this->_space('edgeSpaces', $position, $space, $style, $char);
+        return $this;
+    }
+
+    protected function _space(string $prop, int $position, int $space,  array $style, string $char = ' ') : static {
+        if (!in_array($prop, ['spaces', 'edgeSpaces'], true)) {
+            throw new CliException(sprintf('Invalid Property Name: %s', $prop));
+        }
+
+        if (!in_array($position, range(0, 4), true)) {
+            throw new CliException(sprintf('Invalid Position: %d', $position));
+        }
+
+        if ($position === 4) {
+            foreach(range(0, 3) as $i) {
+                $this->{$prop}[$i] = [$space, $char, $style];
+            }
+        }
+        else {
+            $this->{$prop}[$position] = [$space, $char, $style];
+        }
+        return $this;
     }
 
     public function updateTerminalWidth() : void {
