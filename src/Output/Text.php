@@ -121,6 +121,15 @@ class Text {
         }
 
         foreach($lines as $line) {
+            $bg = [];
+            if(!Styles\BgColors::containsBg($this->styles)) {
+                foreach(['left','right','top','bottom'] as $direction) {
+                    if(isset($$direction[2]) && Styles\BgColors::containsBg($$direction[2], $bg)) {
+                        // print_r($bg);
+                        $this->styles[] = current($bg);
+                    }
+                }
+            }
             $this->lines[] = (
                 $this->add_spaces($eLeft).
                 $this->add_spaces($left).

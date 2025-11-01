@@ -18,4 +18,15 @@ class BgColors {
     public const BRIGHT_MAGENTA = 105;
     public const BRIGHT_CYAN    = 106;
     public const BRIGHT_WHITE   = 107;
+
+    public static function containsBg(array $styles, array &$bg = []) : bool {
+        $bg = (array) array_intersect(
+            array_merge(
+                range(40, 47),
+                range(100, 107)
+            ),
+            array_map('intval', $styles)
+        );
+        return count($bg) > 0;
+    }
 }
