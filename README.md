@@ -162,7 +162,19 @@ and bright variants: `BRIGHT_BLACK`, … `BRIGHT_WHITE`
 **`Formattings`**:
 `BOLD`, `DIM`, `ITALIC`, `UNDERLINE`, `BLINK`, `INVERT`, `HIDE`, `RESET`
 
-### Spacing and padding
+### Padding and margin helpers
+
+`padding()` and `margin()` are named-argument shortcuts over `space()` and `edgeSpace()`:
+
+```php
+(new Text('Hello'))
+    ->style([Colors::WHITE, BgColors::BLUE])
+    ->padding(top: 1, bottom: 1, left: 2, right: 2, style: [BgColors::BLUE])
+    ->margin(top: 1, bottom: 1)
+    ->write();
+```
+
+### Spacing and padding (low-level)
 
 `space()` adds inner padding around the text. `edgeSpace()` adds outer padding that spans the full terminal width. Use the position constants `Text::TOP`, `Text::BOTTOM`, `Text::LEFT`, `Text::RIGHT`, or `Text::ALL`.
 
@@ -218,6 +230,93 @@ $table->render();
 ```
 
 `toString()` returns the table as a string without printing it.
+
+---
+
+## Grid
+
+Lays out content in columns side by side. Each column is a `Cell` that handles its own word-wrap and padding.
+
+### Basic usage — equal columns
+
+Pass an integer to split the terminal width into N equal columns. Pass a `gap` to control spacing between them.
+
+```php
+use PhpCliToolkit\Output\Grid;
+use PhpCliToolkit\Output\Styles\Colors;
+use PhpCliToolkit\Output\Styles\BgColors;
+
+(new Grid(columns: 3, gap: 2))
+    ->cell('Left column content',  style: [Colors::WHITE, BgColors::BLUE])
+    ->cell('Middle column content', style: [Colors::WHITE, BgColors::GREEN])
+    ->cell('Right column content',  style: [Colors::WHITE, BgColors::RED])
+    ->render();
+```
+
+Cells wrap automatically at the column boundary. If cells in the same row have different heights, shorter ones are padded with blank lines so all columns stay aligned.
+
+### Explicit column widths
+
+Pass an array of integers to control each column's exact width in characters:
+
+```php
+(new Grid(columns: [20, 40, 20], gap: 1))
+    ->cell('Narrow')
+    ->cell('This is the wide centre column with more room for content')
+    ->cell('Narrow')
+    ->render();
+```
+
+### Cell padding
+
+Each cell has independent top / right / bottom / left padding. Use named constructor arguments on `Cell` directly, or pass them as positional args to the `cell()` shorthand:
+
+```php
+use PhpCliToolkit\Output\Cell;
+
+(new Grid([30, 30], gap: 2))
+    ->add(new Cell(
+        content:       'Padded cell',
+        style:         [Colors::WHITE, BgColors::BLUE],
+        paddingTop:    1,
+        paddingBottom: 1,
+        paddingLeft:   2,
+        paddingRight:  2,
+        paddingStyle:  [BgColors::BLUE],
+    ))
+    ->cell('No padding here')
+    ->render();
+```
+
+### Multiple rows
+
+Add more cells than there are columns and the grid automatically flows into multiple rows:
+
+```php
+$headers = ['Name', 'Role', 'Status'];
+$rows    = [['Alice', 'Admin', 'Active'], ['Bob', 'Editor', 'Inactive']];
+
+$grid = new Grid([20, 20, 20], gap: 1);
+
+foreach ($headers as $h) {
+    $grid->cell($h, style: [Colors::BRIGHT_WHITE, Formattings::BOLD]);
+}
+foreach ($rows as $row) {
+    foreach ($row as $cell) {
+        $grid->cell($cell);
+    }
+}
+
+$grid->render();
+```
+
+### `toString()`
+
+Returns the rendered grid as a string without printing it, useful for composing output:
+
+```php
+$output = (new Grid([40, 40]))->cell('A')->cell('B')->toString();
+```
 
 ---
 

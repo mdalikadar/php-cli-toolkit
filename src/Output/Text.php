@@ -179,6 +179,22 @@ class Text {
         );
     }
 
+    public function padding(int $top = 0, int $right = 0, int $bottom = 0, int $left = 0, array $style = []): static {
+        if ($top)    $this->space(self::TOP,    $top,    $style);
+        if ($right)  $this->space(self::RIGHT,  $right,  $style);
+        if ($bottom) $this->space(self::BOTTOM, $bottom, $style);
+        if ($left)   $this->space(self::LEFT,   $left,   $style);
+        return $this;
+    }
+
+    public function margin(int $top = 0, int $right = 0, int $bottom = 0, int $left = 0, array $style = []): static {
+        if ($top)    $this->edgeSpace(self::TOP,    $top,    $style);
+        if ($right)  $this->edgeSpace(self::RIGHT,  $right,  $style);
+        if ($bottom) $this->edgeSpace(self::BOTTOM, $bottom, $style);
+        if ($left)   $this->edgeSpace(self::LEFT,   $left,   $style);
+        return $this;
+    }
+
     public function write() : void {
         $this->apply_spaces();
         foreach($this->lines as $line) {
