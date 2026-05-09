@@ -97,7 +97,6 @@ class Text {
                 true
             )
         );
-        // var_dump($this->terminalWidth , $elc,$lines, $lineWidth);exit;
         foreach(($eTop[0] > 0 ? range(1,$eTop[0]) : []) as $lt) {
             $this->lines[] = (
                 $this->apply_style(
@@ -125,7 +124,6 @@ class Text {
             if(!Styles\BgColors::containsBg($this->styles)) {
                 foreach(['left','right','top','bottom'] as $direction) {
                     if(isset($$direction[2]) && Styles\BgColors::containsBg($$direction[2], $bg)) {
-                        // print_r($bg);
                         $this->styles[] = current($bg);
                     }
                 }

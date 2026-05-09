@@ -8,10 +8,20 @@
             "PhpCliToolkit\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "PhpCliToolkit\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "MD ALI KADAR"
         }
     ],
-    "require": {}
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    }
 }

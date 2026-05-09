@@ -1,5 +1,4 @@
 <?php
-
 namespace PhpCliToolkit\Arguments;
 use ArrayAccess;
 use IteratorAggregate;
@@ -11,23 +10,28 @@ class ArgContainer implements ArrayAccess, IteratorAggregate {
     public function __construct() {
         $this->storage = new ArrayIterator();
     }
-    public function getIterator() : Traversable {
+
+    public function getIterator(): Traversable {
         return $this->storage;
     }
 
-    public function offsetExists(mixed $offset) : bool {
+    public function rewind(): void {
+        $this->storage->rewind();
+    }
+
+    public function offsetExists(mixed $offset): bool {
         return isset($this->storage[$offset]);
     }
 
-    public function offsetGet(mixed $offset) : mixed {
+    public function offsetGet(mixed $offset): mixed {
         return $this->storage[$offset] ?? null;
     }
 
-    public function offsetSet(mixed $offset, mixed $value) : void {
+    public function offsetSet(mixed $offset, mixed $value): void {
         $this->storage[$offset] = is_array($value) ? new ArrayIterator($value) : $value;
     }
 
-    public function offsetUnset(mixed $offset) : void {
+    public function offsetUnset(mixed $offset): void {
         unset($this->storage[$offset]);
     }
 }
